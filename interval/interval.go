@@ -32,7 +32,7 @@ func Merge[T Numeric](intervals ...Interval[T]) ([]Interval[T], error) {
 		}
 	}
 
-	// consideration: this will modify this initial slice: in order to avoid this a copy could be created which would cause additional allocation
+	// consideration: this will modify the initial slice: in order to avoid this a copy could be created which would cause additional allocation
 	sort.Slice(intervals, func(a, b int) bool {
 		intervalA := intervals[a]
 		intervalB := intervals[b]
@@ -130,7 +130,7 @@ func (interval Interval[T]) Validate() error {
 }
 
 func (interval Interval[T]) merge(other Interval[T]) (*Interval[T], bool) {
-
+	// the intersection check can be simplified here since the intervals are sorted based on min value before
 	if interval.Max.Value < other.Min.Value {
 		return nil, false
 	} else if interval.Max.Value == other.Min.Value &&
@@ -149,7 +149,7 @@ func (interval Interval[T]) merge(other Interval[T]) (*Interval[T], bool) {
 				Min: interval.Min,
 				Max: Limit[T]{
 					Value: other.Max.Value,
-					Open:  interval.Max.Open && other.Max.Open,
+					Open:  interval.Max.Open && other.Max.Open, // if one of them is open it is the "greater" one
 				},
 			},
 			true

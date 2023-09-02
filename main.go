@@ -13,7 +13,7 @@ func main() {
 		args = strings.Split(args[0], " ")
 	}
 
-	var input []interval.Interval[float64] // float64 is the largest type
+	var input []interval.Interval[float64] // float64 is the largest type even though this is just for demo usage
 	for _, arg := range args {
 		in, err := interval.Parse[float64](arg)
 		if err != nil {
@@ -28,5 +28,5 @@ func main() {
 	}
 
 	resultStr := fmt.Sprintf("%v", result)
-	fmt.Println(resultStr[1 : len(resultStr)-1])
+	fmt.Println(resultStr[1 : len(resultStr)-1]) // strip out brackets from slice stringification
 }
