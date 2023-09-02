@@ -23,7 +23,6 @@ type mergeTest[T Numeric] struct {
 	wantErr    bool
 }
 
-// TODO add test for interval [x,x]
 func runMergeTest[T Numeric](t *testing.T, minValue T, maxValue T) {
 
 	tests := []mergeTest[T]{
