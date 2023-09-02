@@ -23,8 +23,6 @@ type mergeTest[T Numeric] struct {
 	wantErr    bool
 }
 
-// TODO add test for negative numbers
-// TODO add test for interval [x,x]
 func runMergeTest[T Numeric](t *testing.T, minValue T, maxValue T) {
 
 	tests := []mergeTest[T]{
@@ -190,6 +188,46 @@ func runMergeTest[T Numeric](t *testing.T, minValue T, maxValue T) {
 				{
 					Min: Limit[T]{Value: 25, Open: false},
 					Max: Limit[T]{Value: 30, Open: false},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: fmt.Sprintf("NegativeValues %T", *new(T)),
+			intervals: []Interval[T]{
+				{
+					Min: Limit[T]{Value: T(-20), Open: false},
+					Max: Limit[T]{Value: T(-10), Open: false},
+				},
+				{
+					Min: Limit[T]{Value: T(-10), Open: false},
+					Max: Limit[T]{Value: T(-5), Open: false},
+				},
+			},
+			wantResult: []Interval[T]{
+				{
+					Min: Limit[T]{Value: T(-20), Open: false},
+					Max: Limit[T]{Value: T(-5), Open: false},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: fmt.Sprintf("MinimalInervals %T", *new(T)),
+			intervals: []Interval[T]{
+				{
+					Min: Limit[T]{Value: T(6), Open: false},
+					Max: Limit[T]{Value: T(6), Open: false},
+				},
+				{
+					Min: Limit[T]{Value: T(6), Open: false},
+					Max: Limit[T]{Value: T(7), Open: false},
+				},
+			},
+			wantResult: []Interval[T]{
+				{
+					Min: Limit[T]{Value: T(6), Open: false},
+					Max: Limit[T]{Value: T(7), Open: false},
 				},
 			},
 			wantErr: false,
