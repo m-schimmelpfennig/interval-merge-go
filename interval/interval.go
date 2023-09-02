@@ -37,7 +37,7 @@ func Merge[T Numeric](intervals ...Interval[T]) ([]Interval[T], error) {
 	var current *Interval[T]
 	for i, interval := range intervals {
 		if current == nil {
-			// important to use intervals[i] instead of interval since in don't want a pointer to the interval variable that will change in every iteration
+			// important to use intervals[i] instead of interval since we don't want a pointer to the interval variable that will change in every iteration
 			current = &intervals[i]
 			continue
 		}
