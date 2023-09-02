@@ -257,7 +257,7 @@ func runValidationTest[T Numeric](t *testing.T) {
 				Max: Limit[T]{Value: -1, Open: false},
 			},
 			wantErr:      true,
-			errorMessage: "invalid interval [ 2, -1 ]",
+			errorMessage: "invalid interval [2,-1]",
 		},
 		{
 			name: "MaxClosedMinOpen",
@@ -266,7 +266,7 @@ func runValidationTest[T Numeric](t *testing.T) {
 				Max: Limit[T]{Value: -2, Open: true},
 			},
 			wantErr:      true,
-			errorMessage: "invalid interval [ -2, -2 )",
+			errorMessage: "invalid interval [-2,-2)",
 		},
 		{
 			name: "MinOpenClosedMax",
@@ -275,7 +275,7 @@ func runValidationTest[T Numeric](t *testing.T) {
 				Max: Limit[T]{Value: -5, Open: false},
 			},
 			wantErr:      true,
-			errorMessage: "invalid interval ( -5, -5 ]",
+			errorMessage: "invalid interval (-5,-5]",
 		},
 		{
 			name: "BothOpen",
@@ -284,7 +284,7 @@ func runValidationTest[T Numeric](t *testing.T) {
 				Max: Limit[T]{Value: 7, Open: true},
 			},
 			wantErr:      true,
-			errorMessage: "invalid interval ( 7, 7 )",
+			errorMessage: "invalid interval (7,7)",
 		},
 		{
 			name: "BothClosed",

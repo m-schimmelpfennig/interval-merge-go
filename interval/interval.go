@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+	"strconv"
+	"strings"
 )
 
 type Numeric interface {
@@ -74,7 +76,46 @@ func (interval Interval[T]) String() string {
 	if interval.Max.Open {
 		b1 = ")"
 	}
-	return fmt.Sprintf("%s %v, %v %s", b0, interval.Min.Value, interval.Max.Value, b1)
+	return fmt.Sprintf("%s%v,%v%s", b0, interval.Min.Value, interval.Max.Value, b1)
+}
+
+func Parse[T Numeric](input string) (Interval[T], error) {
+	input = strings.TrimSpace(input)
+	iLen := len(input)
+	if iLen < 5 { // minitmal input : "[1,2]"
+		return Interval[T]{}, errors.New(fmt.Sprintf("invalid input %s", input))
+	}
+
+	minIsOpen := false
+	first := input[0:1]
+	if first == "(" {
+		minIsOpen = true
+	} else if first != "[" {
+		return Interval[T]{}, errors.New(fmt.Sprintf("invalid input min limit %s : %s", first, input))
+	}
+	maxIsOpen := false
+	last := input[iLen-1 : iLen]
+	if last == ")" {
+		minIsOpen = true
+	} else if last != "]" {
+		return Interval[T]{}, errors.New(fmt.Sprintf("invalid input max limit %s : %s", last, input))
+	}
+	numbers := strings.Split(input[1:iLen-1], ",")
+	if len(numbers) != 2 {
+		return Interval[T]{}, errors.New(fmt.Sprintf("invalid input values %s", input))
+	}
+	minValue, err := strconv.ParseFloat(numbers[0], 64)
+	if err != nil {
+		return Interval[T]{}, errors.New(fmt.Sprintf("invalid input min value %s : %v", input, err))
+	}
+	maxValue, err := strconv.ParseFloat(numbers[1], 64)
+	if err != nil {
+		return Interval[T]{}, errors.New(fmt.Sprintf("invalid input max value %s : %v", input, err))
+	}
+	return Interval[T]{
+		Min: Limit[T]{Value: T(minValue), Open: minIsOpen},
+		Max: Limit[T]{Value: T(maxValue), Open: maxIsOpen},
+	}, nil
 }
 
 func (interval Interval[T]) Validate() error {
