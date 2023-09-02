@@ -96,7 +96,7 @@ func Parse[T Numeric](input string) (Interval[T], error) {
 	maxIsOpen := false
 	last := input[iLen-1 : iLen]
 	if last == ")" {
-		minIsOpen = true
+		maxIsOpen = true
 	} else if last != "]" {
 		return Interval[T]{}, errors.New(fmt.Sprintf("invalid input max limit %s : %s", last, input))
 	}
