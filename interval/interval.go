@@ -1,6 +1,7 @@
 package interval
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 )
@@ -20,6 +21,15 @@ type Limit[T Numeric] struct {
 }
 
 func Merge[T Numeric](intervals ...Interval[T]) ([]Interval[T], error) {
+
+	//validate input
+	for _, interval := range intervals {
+		err := interval.Validate()
+		if err != nil {
+			return []Interval[T]{}, err
+		}
+	}
+
 	// consideration: this will modify this initial slice: in order to avoid this a copy could be created which would cause additional allocation
 	sort.SliceStable(intervals, func(a, b int) bool {
 		intervalA := intervals[a]
@@ -67,14 +77,24 @@ func (interval Interval[T]) String() string {
 	return fmt.Sprintf("%s %v, %v %s", b0, interval.Min.Value, interval.Max.Value, b1)
 }
 
+func (interval Interval[T]) Validate() error {
+	if interval.Max.Value < interval.Min.Value {
+		return errors.New(fmt.Sprintf("invalid interval %s", interval))
+	}
+	if interval.Max.Value == interval.Min.Value &&
+		(!interval.Max.Open || !interval.Min.Open) {
+		return errors.New(fmt.Sprintf("invalid interval %s", interval))
+	}
+	return nil
+}
+
 func (interval Interval[T]) merge(other Interval[T]) (Interval[T], bool) {
 
 	if interval.Max.Value < other.Min.Value {
 		return Interval[T]{}, false
-	} else if interval.Max.Value == other.Min.Value {
-		if interval.Max.Open || other.Min.Open {
-			return Interval[T]{}, false
-		}
+	} else if interval.Max.Value == other.Min.Value &&
+		interval.Max.Open || other.Min.Open {
+		return Interval[T]{}, false
 	}
 
 	//yes we do have an intersection

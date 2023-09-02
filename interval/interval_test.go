@@ -57,7 +57,7 @@ func run[T Numeric](t *testing.T, minValue T, mexValue T) {
 			res, err := Merge[T](tt.intervals...)
 
 			if tt.wantErr {
-				if err != nil {
+				if err == nil {
 					t.Error("no error returned but an error was expected")
 				}
 			}
