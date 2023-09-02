@@ -93,12 +93,12 @@ func (interval Interval[T]) merge(other Interval[T]) (Interval[T], bool) {
 	if interval.Max.Value < other.Min.Value {
 		return Interval[T]{}, false
 	} else if interval.Max.Value == other.Min.Value &&
-		interval.Max.Open || other.Min.Open {
+		(interval.Max.Open || other.Min.Open) {
 		return Interval[T]{}, false
 	}
 
 	//yes we do have an intersection
-	if interval.Max.Value > other.Min.Value { // interval has the greater upper limit
+	if interval.Max.Value > other.Max.Value { // interval has the greater upper limit
 		return Interval[T]{
 			Min: interval.Min,
 			Max: interval.Max,
