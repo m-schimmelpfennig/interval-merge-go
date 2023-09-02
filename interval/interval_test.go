@@ -7,25 +7,27 @@ import (
 )
 
 func TestIntervalMerge(t *testing.T) {
-	run[int](t, math.MaxInt, math.MaxInt)
-	run[int8](t, math.MinInt8, math.MaxInt8)
-	run[int16](t, math.MinInt8, math.MaxInt8)
-	run[int32](t, math.MinInt8, math.MaxInt8)
-	run[int64](t, math.MinInt8, math.MaxInt8)
-	run[float32](t, math.MinInt8, math.MaxInt8)
-	run[float64](t, math.MinInt8, math.MaxInt8)
+	runMergeTest[int](t, math.MaxInt, math.MaxInt)
+	runMergeTest[int8](t, math.MinInt8, math.MaxInt8)
+	runMergeTest[int16](t, math.MinInt8, math.MaxInt8)
+	runMergeTest[int32](t, math.MinInt8, math.MaxInt8)
+	runMergeTest[int64](t, math.MinInt8, math.MaxInt8)
+	runMergeTest[float32](t, math.MinInt8, math.MaxInt8)
+	runMergeTest[float64](t, math.MinInt8, math.MaxInt8)
 }
 
-type test[T Numeric] struct {
+type mergeTest[T Numeric] struct {
 	name       string
 	intervals  []Interval[T]
 	wantResult []Interval[T]
 	wantErr    bool
 }
 
-func run[T Numeric](t *testing.T, minValue T, maxValue T) {
+// TODO add test for negative numbers
+// TODO add test for interval [x,x]
+func runMergeTest[T Numeric](t *testing.T, minValue T, maxValue T) {
 
-	tests := []test[T]{
+	tests := []mergeTest[T]{
 		{
 			name: fmt.Sprintf("OnlyOneElement %T", *new(T)),
 			intervals: []Interval[T]{
@@ -225,4 +227,92 @@ func run[T Numeric](t *testing.T, minValue T, maxValue T) {
 	}
 }
 
-//TODO implement validation test cases
+type validationTest[T Numeric] struct {
+	name         string
+	interval     Interval[T]
+	wantErr      bool
+	errorMessage string
+}
+
+func TestValidation(t *testing.T) {
+	runValidationTest[int](t)
+}
+
+func runValidationTest[T Numeric](t *testing.T) {
+
+	tests := []validationTest[T]{
+		{
+			name: "NoErrorExpected",
+			interval: Interval[T]{
+				Min: Limit[T]{Value: 25, Open: false},
+				Max: Limit[T]{Value: 30, Open: false},
+			},
+			wantErr:      false,
+			errorMessage: "",
+		},
+		{
+			name: "BasicErrorCase",
+			interval: Interval[T]{
+				Min: Limit[T]{Value: 2, Open: false},
+				Max: Limit[T]{Value: -1, Open: false},
+			},
+			wantErr:      true,
+			errorMessage: "invalid interval [ 2, -1 ]",
+		},
+		{
+			name: "MaxClosedMinOpen",
+			interval: Interval[T]{
+				Min: Limit[T]{Value: -2, Open: false},
+				Max: Limit[T]{Value: -2, Open: true},
+			},
+			wantErr:      true,
+			errorMessage: "invalid interval [ -2, -2 )",
+		},
+		{
+			name: "MinOpenClosedMax",
+			interval: Interval[T]{
+				Min: Limit[T]{Value: -5, Open: true},
+				Max: Limit[T]{Value: -5, Open: false},
+			},
+			wantErr:      true,
+			errorMessage: "invalid interval ( -5, -5 ]",
+		},
+		{
+			name: "BothOpen",
+			interval: Interval[T]{
+				Min: Limit[T]{Value: 7, Open: true},
+				Max: Limit[T]{Value: 7, Open: true},
+			},
+			wantErr:      true,
+			errorMessage: "invalid interval ( 7, 7 )",
+		},
+		{
+			name: "BothClosed",
+			interval: Interval[T]{
+				Min: Limit[T]{Value: 0, Open: false},
+				Max: Limit[T]{Value: 0, Open: false},
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.interval.Validate()
+			if tt.wantErr {
+				if err == nil {
+					t.Error("no error returned but an error was expected")
+				} else {
+					if err.Error() != tt.errorMessage {
+						t.Errorf("expected error %s did not match returend error %v", tt.errorMessage, err)
+					}
+				}
+			} else {
+				if err != nil {
+					t.Error("error returned but no error was expected")
+				}
+			}
+		})
+	}
+}

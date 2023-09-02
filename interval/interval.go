@@ -82,7 +82,7 @@ func (interval Interval[T]) Validate() error {
 		return errors.New(fmt.Sprintf("invalid interval %s", interval))
 	}
 	if interval.Max.Value == interval.Min.Value &&
-		(!interval.Max.Open || !interval.Min.Open) {
+		(interval.Max.Open || interval.Min.Open) {
 		return errors.New(fmt.Sprintf("invalid interval %s", interval))
 	}
 	return nil
