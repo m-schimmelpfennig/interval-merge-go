@@ -54,7 +54,7 @@ func Merge[T Numeric](intervals ...Interval[T]) ([]Interval[T], error) {
 			continue
 		}
 		if merged, didMerge := current.merge(interval); didMerge {
-			current = &merged
+			current = merged
 		} else {
 			result = append(result, *current)
 			current = &intervals[i]
@@ -129,23 +129,23 @@ func (interval Interval[T]) Validate() error {
 	return nil
 }
 
-func (interval Interval[T]) merge(other Interval[T]) (Interval[T], bool) {
+func (interval Interval[T]) merge(other Interval[T]) (*Interval[T], bool) {
 	// the intersection check can be simplified here since the intervals are sorted based on min value before
 	if interval.Max.Value < other.Min.Value {
-		return Interval[T]{}, false
+		return nil, false
 	} else if interval.Max.Value == other.Min.Value &&
 		(interval.Max.Open || other.Min.Open) {
-		return Interval[T]{}, false
+		return nil, false
 	}
 
 	//yes we do have an intersection
 	if interval.Max.Value > other.Max.Value { // interval has the greater upper limit
-		return Interval[T]{
+		return &Interval[T]{
 			Min: interval.Min,
 			Max: interval.Max,
 		}, true
 	} else if interval.Max.Value == other.Max.Value { // limits are semi equal
-		return Interval[T]{
+		return &Interval[T]{
 				Min: interval.Min,
 				Max: Limit[T]{
 					Value: other.Max.Value,
@@ -155,7 +155,7 @@ func (interval Interval[T]) merge(other Interval[T]) (Interval[T], bool) {
 			true
 	}
 	// other has the upper limit
-	return Interval[T]{
+	return &Interval[T]{
 		Min: interval.Min,
 		Max: other.Max,
 	}, true
