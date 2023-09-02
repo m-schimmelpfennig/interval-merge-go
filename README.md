@@ -17,7 +17,7 @@ The projects Makefile contains the following target to build an executable file.
 ```shell
 make build
 ```
-this will generate an executable file `interval-merge`
+This will generate an executable file `interval-merge`
 
 ## Commandline Usage
 
@@ -33,7 +33,7 @@ See mathematical notation https://en.wikipedia.org/wiki/Interval_(mathematics)#N
 
 ## Code Usage
 
-the following example illustrates how to invoke the merge function when used as a library.
+The following example illustrates how to invoke the merge function when used as a library.
 
 ```Go
 intervals := []interval.Interval[int]{ // define a set of intervals to merge using generic numeric type
@@ -52,7 +52,7 @@ res, err := interval.Merge[int](intervals...)
 
 ### Errors
 
-the merge function may return an error if the input contains invalid intervals. Intervals are considered invalid
+The merge function may return an error if the input contains invalid intervals. Intervals are considered invalid
 once the minimum value is greater than the maximum value or the minimum and maximum values are equal but at least one of them is an open interval limit
 
 ## Unit Tests
