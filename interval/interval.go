@@ -33,7 +33,7 @@ func Merge[T Numeric](intervals ...Interval[T]) ([]Interval[T], error) {
 	}
 
 	// consideration: this will modify this initial slice: in order to avoid this a copy could be created which would cause additional allocation
-	sort.SliceStable(intervals, func(a, b int) bool {
+	sort.Slice(intervals, func(a, b int) bool {
 		intervalA := intervals[a]
 		intervalB := intervals[b]
 		if intervalA.Min.Value == intervalB.Min.Value {
