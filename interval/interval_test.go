@@ -7,9 +7,13 @@ import (
 )
 
 func TestIntervalMerge(t *testing.T) {
-
 	run[int](t, math.MaxInt, math.MaxInt)
 	run[int8](t, math.MinInt8, math.MaxInt8)
+	run[int16](t, math.MinInt8, math.MaxInt8)
+	run[int32](t, math.MinInt8, math.MaxInt8)
+	run[int64](t, math.MinInt8, math.MaxInt8)
+	run[float32](t, math.MinInt8, math.MaxInt8)
+	run[float64](t, math.MinInt8, math.MaxInt8)
 }
 
 type test[T Numeric] struct {
@@ -67,6 +71,30 @@ func run[T Numeric](t *testing.T, minValue T, maxValue T) {
 				},
 				{
 					Min: Limit[T]{Value: T(5), Open: false},
+					Max: Limit[T]{Value: T(10), Open: false},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: fmt.Sprintf("OpenClosedIntersection %T", *new(T)),
+			intervals: []Interval[T]{
+				{
+					Min: Limit[T]{Value: T(3), Open: false},
+					Max: Limit[T]{Value: T(5), Open: false},
+				},
+				{
+					Min: Limit[T]{Value: T(5), Open: true},
+					Max: Limit[T]{Value: T(10), Open: false},
+				},
+			},
+			wantResult: []Interval[T]{
+				{
+					Min: Limit[T]{Value: T(3), Open: false},
+					Max: Limit[T]{Value: T(5), Open: false},
+				},
+				{
+					Min: Limit[T]{Value: T(5), Open: true},
 					Max: Limit[T]{Value: T(10), Open: false},
 				},
 			},
